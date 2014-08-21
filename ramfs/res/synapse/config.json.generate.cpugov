@@ -1,0 +1,65 @@
+#!/system/bin/sh
+
+cat << CTAG
+{
+	name:CPU Governor,
+		elements:[
+			{ SPane:{
+				title:"CPU Governor",
+				description:" The CPU governor determines how the CPU behaves in response to changes in workload."
+			}},
+			{ SOptionList:{
+				default:`cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor`,
+				action:"generic /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor",
+				values:[`while read values; do busybox printf "%s, \n" $values; done < /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors`],				
+				notify:[
+					{
+						on:APPLY,
+						do:[ REFRESH, CANCEL ],
+						to:"/sys/devices/system/cpu/cpufreq"
+					},
+					{
+						on:REFRESH,
+						do:REFRESH,
+						to:"/sys/devices/system/cpu/cpufreq"
+					}
+				]
+			}},
+			{ SPane:{
+				title:"Multi-Core Power Management",
+				description:" The CPU governor determines how the CPU behaves in response to changes in workload."
+			}},
+			{ SSeekBar:{
+				description:"Sets the sched_mc value which changes the cpu scheduler behaviour for multi-cpu systems. 0 is kernel's default value which turns sched_mc off. Setting it to 1 means that the first core will be tried to be loaded more and setting it to 2 will bias task wake-ups to semi-idle cpu package for power savings",
+				max:2, min:0, unit:"", step:1,
+				default:`cat /sys/devices/system/cpu/sched_mc_power_savings`,
+				action:"generic /sys/devices/system/cpu/sched_mc_power_savings",
+						values:{
+								"0":"Disabled",
+								"1":"Mode 1",
+								"2":"Mode 2",
+						}
+        }},
+			{ SPane:{
+				title:"CPU Governor Tunables",
+			}},
+				{ STreeDescriptor:{
+					path:"/sys/devices/system/cpu/cpufreq",
+					generic: {
+						directory: {
+							STreeDescriptor:{
+								generic: {
+									directory: {},
+									element: {
+										SGeneric: { title:"@BASENAME" }
+									}
+								},
+								exclude: [ "boostpulse", "sampling_rate_min", "cpufreq_limit_requests", "target_loads", "timer_rate", "above_hispeed_delay", "go_hispeed_load" ]
+							},
+						}
+					},
+					exclude: [ "overall_stats", "vdd_table" ]
+				}},
+		]
+}
+CTAG

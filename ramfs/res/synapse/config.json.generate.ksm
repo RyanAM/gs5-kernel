@@ -1,0 +1,36 @@
+#!/system/bin/sh
+
+cat << CTAG
+{
+	name:KSM,
+		elements:[
+			{ SPane:{
+				title:"KSM Control",
+				description:" Enabling Kernel SamePage Merging (KSM) will merge some memory > possible slight performance bump, but need a little bit cpu-power + battery. Default is OFF."
+			}},
+			{ SCheckBox:{
+				label:"Enable or Disable KSM",
+				default:`cat /sys/kernel/mm/ksm/run`,
+				action:"generic /sys/kernel/mm/ksm/run"
+				}},
+			{ SSeekBar:{
+				title:"Pages to Scan",
+				unit:" pages",
+				step:10,
+				min:0,
+				max:500,
+				default:`cat /sys/kernel/mm/ksm/pages_to_scan`,
+				action:"generic /sys/kernel/mm/ksm/pages_to_scan"
+				}},
+			{ SSeekBar:{
+				title:"Scan Delay Interval",
+				unit:" ms",
+				step:10,
+				min:0,
+				max:500,
+				default:`cat /sys/kernel/mm/ksm/sleep_millisecs`,
+				action:"generic /sys/kernel/mm/ksm/sleep_millisecs"
+			}},
+		]
+}
+CTAG

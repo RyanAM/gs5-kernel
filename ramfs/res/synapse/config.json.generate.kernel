@@ -1,0 +1,178 @@
+#!/system/bin/sh
+
+cat << CTAG
+{
+    name:I/O - MEMORY,
+    elements:[
+    { SPane:{
+		title:"I/O Schedulers",
+		description:" Set the active I/O elevator algorithm. The scheduler decides how to handle I/O requests and how to handle them."
+    }},
+	{ SOptionList:{
+		title:"Internal_storage scheduler",
+		default:`cat /sys/block/mmcblk0/queue/scheduler | busybox awk 'NR>1{print $1}' RS=[ FS=]`,
+		action:"scheduler /sys/block/mmcblk0/queue/scheduler",
+		values:[`while read values; do busybox printf "%s, \n" $values | busybox tr -d '[]'; done < /sys/block/mmcblk0/queue/scheduler`],				
+		notify:[
+			{
+				on:APPLY,
+				do:[ REFRESH, CANCEL ],
+				to:"/sys/block/mmcblk0/queue/iosched"
+			},
+			{
+				on:REFRESH,
+				do:REFRESH,
+				to:"/sys/block/mmcblk0/queue/iosched"
+			}
+		]
+	}},
+	{ SSeekBar:{
+		title:"Internal_storage read-ahead",
+		max:2048,
+		min:128,
+		unit:" kB",
+		step:128,
+		default:`cat /sys/block/mmcblk0/queue/read_ahead_kb`,
+		action:"generic /sys/block/mmcblk0/queue/read_ahead_kb"
+	}},
+	{ SOptionList:{
+		title:"ExternalSD scheduler",
+		default:`cat /sys/block/mmcblk1/queue/scheduler | busybox awk 'NR>1{print $1}' RS=[ FS=]`,
+		action:"scheduler /sys/block/mmcblk1/queue/scheduler",
+		values:[`while read values; do busybox printf "%s, \n" $values | busybox tr -d '[]'; done < /sys/block/mmcblk1/queue/scheduler`],				
+		notify:[
+			{
+				on:APPLY,
+				do:[ REFRESH, CANCEL ],
+				to:"/sys/block/mmcblk1/queue/iosched"
+			},
+			{
+				on:REFRESH,
+				do:REFRESH,
+				to:"/sys/block/mmcblk1/queue/iosched"
+			}
+		]
+	}},
+	{ SSeekBar:{
+		title:"ExternalSD read-ahead",
+		max:2048,
+		min:128,
+		unit:" kB",
+		step:128,
+		default:`cat /sys/block/mmcblk1/queue/read_ahead_kb`,
+		action:"generic /sys/block/mmcblk1/queue/read_ahead_kb"
+	}},
+	{ SPane:{
+		title:"General I/O Tunables",
+		description:" Set the internal storage general tunables"
+	}},
+	{ SPane:{
+		title:"Internal",
+	}},
+	{ SCheckBox:{
+		description:" Draw entropy from spinning (rotational) storage. Default is Enabled",
+		label:"Add Random",
+		default:`cat /sys/block/mmcblk0/queue/add_random`,
+		action:"generic /sys/block/mmcblk0/queue/add_random"
+	}},
+	{ SCheckBox:{
+		description:" Maintain I/O statistics for this storage device. Disabling will break I/O monitoring apps. Default is Enabled.",
+		label:"I/O Stats",
+		default:`cat /sys/block/mmcblk0/queue/iostats`,
+		action:"generic /sys/block/mmcblk0/queue/iostats"
+	}},
+	{ SCheckBox:{
+		description:" Treat device as rotational storage. Default is Disabled",
+		label:"Rotational",
+		default:`cat /sys/block/mmcblk0/queue/rotational`,
+		action:"generic /sys/block/mmcblk0/queue/rotational"
+	}},				
+	{ SSeekBar:{
+		title:" No Merges",
+		description:" Types of merges (prioritization) the scheduler queue for this storage device allows. Default is All.",
+		default:`cat /sys/block/mmcblk0/queue/nomerges`,
+		action:"generic /sys/block/mmcblk0/queue/nomerges",
+		values:{
+			`NM='0:"All", 1:"Simple Only", 2:"None",'
+			echo $NM`
+		}
+	}},
+	{ SSeekBar:{
+		title:"RQ Affinity",
+		description:" Try to have scheduler requests complete on the CPU core they were made from. Higher is more aggressive. Some kernels only support 0-1. Default is 1.",
+		default:`cat /sys/block/mmcblk0/queue/rq_affinity`,
+		action:"generic /sys/block/mmcblk0/queue/rq_affinity",
+		values:{
+			`RQA='0:"0: Disabled", 1:"1", 2:"2"'
+			echo $RQA`
+		}
+	}},
+	{ SPane:{
+		title:"External",
+	}},
+	{ SCheckBox:{
+		description:" Draw entropy from spinning (rotational) storage. Default is Enabled",
+		label:"Add Random",
+		default:`cat /sys/block/mmcblk1/queue/add_random`,
+		action:"generic /sys/block/mmcblk1/queue/add_random"
+	}},
+	{ SCheckBox:{
+		description:" Maintain I/O statistics for this storage device. Disabling will break I/O monitoring apps. Default is Enabled.",
+		label:"I/O Stats",
+		default:`cat /sys/block/mmcblk1/queue/iostats`,
+		action:"generic /sys/block/mmcblk1/queue/iostats"
+	}},
+	{ SCheckBox:{
+		description:" Treat device as rotational storage. Default is Disabled",
+		label:"Rotational",
+		default:`cat /sys/block/mmcblk1/queue/rotational`,
+		action:"generic /sys/block/mmcblk1/queue/rotational"
+	}},				
+	{ SSeekBar:{
+		title:" No Merges",
+		description:" Types of merges (prioritization) the scheduler queue for this storage device allows. Default is All.",
+		default:`cat /sys/block/mmcblk1/queue/nomerges`,
+		action:"generic /sys/block/mmcblk1/queue/nomerges",
+		values:{
+			`NM='0:"All", 1:"Simple Only", 2:"None",'
+			echo $NM`
+		}
+	}},
+	{ SSeekBar:{
+		title:"RQ Affinity",
+		description:" Try to have scheduler requests complete on the CPU core they were made from. Higher is more aggressive. Some kernels only support 0-1. Default is 1.",
+		default:`cat /sys/block/mmcblk1/queue/rq_affinity`,
+		action:"generic /sys/block/mmcblk1/queue/rq_affinity",
+		values:{
+			`RQA='0:"0: Disabled", 1:"1", 2:"2"'
+			echo $RQA`
+		}
+	}},
+	{ SPane:{
+		title:"I/O Scheduler Tunables - Internal",
+	}},
+	{ STreeDescriptor:{
+		path:"/sys/block/mmcblk0/queue/iosched",
+		generic: {
+			directory: {},
+			element: {
+				SGeneric: { title:"@BASENAME" }
+			}
+		},
+	}},
+	{ SPane:{
+		title:"I/O Scheduler Tunables - External",
+	}},
+	{ STreeDescriptor:{
+		path:"/sys/block/mmcblk1/queue/iosched",
+		generic: {
+			directory: {},
+			element: {
+				SGeneric: { title:"@BASENAME" }
+			}
+		},
+		exclude: [ "weights" ]
+	}},
+    ]
+}
+CTAG

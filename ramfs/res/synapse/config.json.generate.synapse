@@ -1,0 +1,157 @@
+#!/sbin/busybox sh
+
+cat << CTAG
+{
+    name:"Actions",
+    elements:[
+    	{ SPane:{
+		title:"About this tab",
+		description:"\n\tVarious shortcuts for common tasks.\n\n"
+        }},
+        { SPane:{
+		title:"Synapse Backup",
+		description:"\n\tBacks up current Synapse settings to internal storage (/sdcard/Aurora_Kernel/backup_synapse). This means it will persist between ROMs, assuming you don't wipe your internal storage.\n\n"
+        }},
+        { SLiveLabel:{
+			title:"Last Synapse Backup",
+			refresh:1000,
+			action:"
+			if [ -f /sdcard/Aurora_Kernel/backup_synapse/actionValueStore ]; then
+				echo \$(busybox date -r /sdcard/Aurora_Kernel/backup_synapse/actionValueStore '+%a, %B %e @ %I:%M %p');
+			else
+				echo No backup found;
+			fi;
+			"
+		}},
+		{ SDescription:{
+		   description:""
+		}},
+		{ SButton:{
+			label:"Backup Synapse",
+			action:"
+			if [ -d /sdcard/Aurora_Kernel/backup_synapse ]; then
+				cp /data/data/com.af.synapse/databases/* /sdcard/Aurora_Kernel/backup_synapse/;
+				echo Backed Up!;
+			else
+				echo Backup directory missing...creating...
+				mkdir -p /sdcard/Aurora_Kernel/backup_synapse;
+				if [ -d /data/media/0/Aurora_Kernel/backup_synapse ]; then
+					cp /data/data/com.af.synapse/databases/* /sdcard/Aurora_Kernel/backup_synapse;
+					echo backed up!;
+				else
+					echo failed!;
+				fi;
+			fi;
+			"
+		}},
+		{ SDescription:{
+		   description:""
+		}},
+		{ SButton:{
+			label:"Restore & Close Synapse",
+			action:"
+			if [ -f /sdcard/Aurora_Kernel/backup_synapse/actionValueStore ]; then
+				rm -f /data/data/com.af.synapse/databases/actionValueStore*;
+				cp /sdcard/Aurora_Kernel/backup_synapse/actionValueStore* /data/data/com.af.synapse/databases/;
+				chmod 666 /data/data/com.af.synapse/databases/*;
+				pkill -f synapse;
+			else
+				echo No backup found!;
+			fi;
+			"
+		}},
+		{ SDescription:{
+		   description:""
+		}},
+		{ SButton:{
+			label:"Reset & Close Synapse",
+			action:"
+			rm -f /data/data/com.af.synapse/databases/actionValueStore*;
+			echo Reset, now restarting Synapse!;
+			pkill -f synapse;";
+		}},
+		{ SDescription:{
+		   description:"\n"
+		}},
+		{ SPane:{
+		title:"Filesystem Controls",
+		description:""
+        }},
+		{ SButton:{
+			label:"Remount /system as Writeable",
+			action:"mount -o remount,rw \/system;
+			echo Remounted \/system as Writable!;"
+		}},
+		{ SDescription:{
+		   description:""
+		}},
+		{ SButton:{
+			label:"Remount /system as Read-Only",
+			action:"mount -o remount,ro \/system;
+			echo Remounted \/system as Read-Only!;"
+		}},
+		{ SDescription:{
+		   description:""
+		}},
+		{ SButton:{
+			label:"Remount RootFS as Writeable",
+			action:"/sbin/busybox mount -t rootfs -o remount,rw rootfs;
+			echo Remounted RootFS as Writable!;"
+		}},
+		{ SDescription:{
+		   description:""
+		}},
+		{ SButton:{
+			label:"Remount RootFS as Read-Only",
+			action:"/sbin/busybox mount -t rootfs -o remount,ro rootfs;
+			echo Remounted RootFS as Read-Only!;"
+		}},
+		{ SDescription:{
+		   description:"\n"
+		}},
+	{ SLiveLabel:{
+		refresh:10000000,
+		title:"Filesystem of /cache Partition",
+		style:"normal",
+		action:"
+		if grep -q 'cache f2fs' /proc/mounts ; then
+			echo F2FS;
+		else
+			echo EXT4;
+		fi;"
+	}},
+	{ SSpacer:{
+	   height:1
+	}},
+	{ SLiveLabel:{
+		refresh:10000000,
+		title:"Filesystem of /data Partition",
+		style:"normal",
+		action:"
+		if grep -q 'data f2fs' /proc/mounts ; then
+			echo F2FS;
+		else
+			echo EXT4;
+		fi;"
+	}},
+	{ SSpacer:{
+	   height:1
+	}},
+	{ SLiveLabel:{
+		refresh:10000000,
+		title:"Filesystem of /system Partition",
+		style:"normal",
+		action:"
+		if grep -q 'system f2fs' /proc/mounts ; then
+			echo F2FS;
+		else
+			echo EXT4;
+		fi;"
+	}},
+	{ SSpacer:{
+	   height:1
+	}},
+    ]
+}
+
+CTAG

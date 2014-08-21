@@ -1,0 +1,11 @@
+#!/sbin/busybox sh
+vnswap_size=`cat /data/.aurura/vnswap`;
+	swapoff /dev/block/vnswap0 > /dev/null 2>&1
+
+	if [ $vnswap_size -gt 0 ]; then
+		echo `expr $vnswap_size \* 1024 \* 1024` > /sys/devices/virtual/block/vnswap0/disksize
+		mkswap /dev/block/vnswap0 > /dev/null 2>&1
+		swapon /dev/block/vnswap0 > /dev/null 2>&1
+	fi
+
+echo "Done"

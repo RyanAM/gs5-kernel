@@ -1,0 +1,60 @@
+#!/system/bin/sh
+
+cat << CTAG
+{
+    name:INFO,
+    elements:[
+	{ SPane:{
+		title:"Source",
+		description:" Based on official Samsung NE6 sources"
+	}},
+	{ SPane:{
+		title:"Build by",
+		description:" MojoManagement"
+	}},
+	{ SPane:{
+		title:"Special thanks for Synapse interface to",
+		description:"  UpInTheAir"
+	}},
+	{ SPane:{
+		title:"Kernel"
+	}},
+	{ SLiveLabel:{
+		refresh:10000,
+		action:"default version"
+	}},
+	{ SPane:{
+		title:"Build"
+	}},
+	{ SLiveLabel:{
+		refresh:10000,
+		action:"default build"
+	}},
+	{ SPane:{
+		title:"Baseband"
+	}},
+	{ SLiveLabel:{
+		refresh:10000,
+		action:"default baseband"
+	}},
+	{ SPane:{
+		title:"Bootloader"
+	}},
+	{ SLiveLabel:{
+		refresh:10000,
+		action:"default bootloader"
+	}},
+	{ SPane:{
+		title:"Serial"
+	}},
+	{ SLiveLabel:{
+		refresh:10000,
+		action:"default serial"
+	}},
+	{ SButton:{
+	   label:"Please donate if you like my work and support me!",
+	   action:"am start -a android.intent.action.VIEW -d http://forum.xda-developers.com/donatetome.php?u=4466180"
+	}},
+    ]
+}
+CTAG

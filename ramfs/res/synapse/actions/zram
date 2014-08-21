@@ -1,0 +1,21 @@
+
+zram_size=512;
+
+	if [ $1 == 1 ]; then
+		mkswap /dev/block/zram0
+		swapoff /dev/block/zram0 >/dev/null 2>&1;
+		echo "1" > /sys/block/zram0/reset >/dev/null 2>&1;
+		echo `expr $zram_size \* 1024 \* 1024` > /sys/block/zram0/disksize;
+                # creating SWAP from ZRAM drives
+                mkswap /dev/block/zram0 >/dev/null;
+                # activating ZRAM swaps
+                chmod 755 /sbin/swapon >/dev/null 2>&1;
+                swapon /dev/block/zram0 >/dev/null 2>&1;
+	        echo 1 > /data/.aurura/zram;
+	else
+		swapoff /dev/block/zram0 >/dev/null 2>&1;
+                echo "1" > /sys/block/zram0/reset >/dev/null 2>&1;
+	        echo 0 > /data/.aurura/zram;
+	fi
+
+echo "Done"
